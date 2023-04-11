@@ -1,0 +1,22 @@
+Day 1 [April 5th]: Intro Session: 
+---------------------
+Topics Discussed: 
+----
+1. Introduction
+2. Overview of topics that needs to be discussed
+
+TODO: 
+=====
+1. Environment setup (IntelliJ or Eclipse or Netbeans). Or Any IDE that you are comfortable with. 
+ Link: https://www.jetbrains.com/idea/download/#section=windows
+
+2. For intelliJ we can use inbuilt JDK.
+ But I would also suggest to have JDK installed on your Machine, Preferable JDK 11 or higher.. 
+
+3. Have git installed on your machine
+
+4. Github repo setup, create a new account ( if you don't have one). 
+ https://github.com/signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F&source=header-home
+
+
+
