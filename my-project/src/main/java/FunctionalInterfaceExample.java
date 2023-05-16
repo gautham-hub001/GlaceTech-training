@@ -1,3 +1,7 @@
+import java.util.Arrays;
+import java.util.function.Predicate;
+import java.util.List;
+
 // THis is annotation is not mandatory. It can be used for debugging
 @FunctionalInterface
 interface A {
@@ -24,5 +28,13 @@ public class FunctionalInterfaceExample {
         a.print();
         a1.print();
         a2.print();
+
+        // builtin functions
+        Predicate<String> p = s -> s.startsWith("A");
+        System.out.println(p.test("Abc"));
+
+        List<String> names = Arrays.asList("Apple", "Amazon", "Google", "Microsoft");
+        System.out.println(ApplyPredicateFunc.applyPredicateArrayList(names, p));
+        List<Integer> l = List.of(1, 2, 3, 4, 5);
     }
 }

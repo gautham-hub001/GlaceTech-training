@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 
 public class ForEach {
     public static void main(String[] args) {
-        List<Integer> l = Arrays.asList(1, 2, 3, 4);
+        List<Integer> l = Arrays.asList(1, 2, 3, 4); // this is fixed list. you cannot add elements later
 
         // for loop
         for (int i = 0; i < l.size(); i++) {
