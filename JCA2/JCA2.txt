@@ -1,0 +1,55 @@
+Note: Given a text file in csv format. Read the file and perform below operations.
+[firstName, lastName, gender, date of birth, email,  employee Id, ein]
+
+1. Read the text file and print all the lines.
+
+2. Create class
+ a. Employee - (firstName, lastName, gender, dob, email, employeeId, ein)
+
+3. Read text file and map the above objects and store in List data structure
+Hint: List<Employee>
+
+-----Try using stream API
+4. Create a Map data structure with EIN as Key and List<Employees> as value.
+Map<Integer, List<Employee>> ein, list of employees
+
+5. Create a Map data structure with EIN as Key and Company as value.
+Map<Integer, String> -> ein, name
+
+6. Print the  company with highest no of females, highest no of males, lowest no of females, lowest no of males.
+???????????????????????????
+
+7. Print all employees whose age is greater than 35 years.
+<firstName, lastName, current age, company name> ?????
+Hint: use Period.
+
+8. Print all employees in the below format.
+a. [companyName, ein, firstName, lastName, email, employeeId] - sorted by FirstName
+b. [companyName, ein, firstName, lastName, email, employeeId] - sorted by lastName
+c. [companyName, ein, firstName, lastName, email, employeeId] - sorted by employee Id
+
+9. Print all:
+ a. company names along with no of employees working in each company (considering employees.txt file)
+ <companyname, no of employees>
+ b.  Find the company with highest and lowest no of employees(considering employees.txt file)
+
+10. Re-write the existing solutions in JCA1 using stream-API.
+//comment the existing logic and rewrite it using "stream api"
+--------------------------------------------------------------------
+
+Programming Interview Questions:
+-------------------------------
+1. Sort an arraylist of Integer in  descending order using Stream functions?
+2. Example of a map and flatmap
+3. Define below Functional interfaces and write atleast 5 Lambda expressions for each with your own use cases:
+   Predicate
+   Function
+   Consumer
+   Supplier
+   BiFunction
+   BinaryOperator
+   UnaryOperator
+4. What are short-circuit operation in stream API and provide examples for each.
+5. Create a custom Exception
+
+

@@ -30,11 +30,17 @@ public class FunctionalInterfaceExample {
         a2.print();
 
         // builtin functions
-        Predicate<String> p = s -> s.startsWith("A");
+        Predicate<String> p = s -> s.startsWith("A"); // startsWith returns true/false
         System.out.println(p.test("Abc"));
 
         List<String> names = Arrays.asList("Apple", "Amazon", "Google", "Microsoft");
-        System.out.println(ApplyPredicateFunc.applyPredicateArrayList(names, p));
-        List<Integer> l = List.of(1, 2, 3, 4, 5);
+        // names.add(10, null);
+        System.out.println(ApplyPredicateFunc.applyPredicateArrayList(names, p)); // we're passing functional interface
+                                                                                  // as
+                                                                                  // argument. Indirectly, we're passing
+                                                                                  // methods as arguments.
+        List<Integer> l = List.of(1, 2, 3, 4, 5); // this is same as Arrays.asList(). But This is immutable list. // It
+                                                  // returns immutable list. That is the array names cannot be
+                                                  // modified later
     }
 }

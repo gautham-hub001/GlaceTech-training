@@ -161,6 +161,11 @@ Unchecked Exceptions / RuntimeExceptions:
 1. NullPointerException
    String num; // null
    num.substring(2,4); // NullPointerException because you're trying to access null value
+   num.length(); // NullPointerException
+
+   // So, you can use Optional
+   Optional<String> num;
+
 2. ArithmeticException - Divide by 0
 
 finally block:
@@ -186,6 +191,8 @@ Collection interface
 List, Set, Queue interfaces
 
 Imp Note: Collection is an interface. Collections is a utility class (since it has utility functions like sort())
+import java.util.Collections;
+Collections.sort(names);
 
 1. List properties
    can contain duplicate values
@@ -308,42 +315,254 @@ Java 8 (1.8)features:
    }
    }
 
-Note: We can also use @FunctionalInterface annotation - from java.lang.
-Note: lambda expression (->) is same arrow function in javascript (=>)
+   Note: We can also use @FunctionalInterface annotation - from java.lang.
+   Note: lambda expression (->) is same arrow function in javascript (=>)
 
-There are 4 functional interfaces provided by Java:
+   There are 4 functional interfaces provided by Java:
 
-1. consumer - the method accept takes input but does not return anything
-2. supplier - the method get does not take any input but returns something
-3. function - the method apply takes input and returns something
-4. predicate - it is a function but it returns boolean
+   1. consumer - the method accept takes input but does not return anything
+   2. supplier - the method get does not take any input but returns something
+   3. function - the method apply takes input and returns something
+   4. predicate - it is a function but it returns boolean
 
-Special cases of functional interfaces:
-Bi-Consumer, BiFunction, BiPredicate - all these have methods that accept two arguments
+   Special cases of functional interfaces:
+   BiConsumer, BiFunction, BiPredicate - all these have methods that accept two arguments
 
-variants of Function:
-Unary operator - datatype of argument and return value are same
-Binary operator - datatype of both both arguments and the return type are all same
+   variants of Function:
+   UnaryOperator - datatype of argument and return value are same
+   BinaryOperator - datatype of both both arguments and the return type are all same
 
-1. consumer
-   interface Consumer {
-   void accept(int a);
-   }
-2. supplier
-   interface Supplier {
-   public abstract int get();
-   }
-3. function
-   interface Function {
-   public abstract int apply(int a);
-   }
-4. predicate
-   interface Predicate {
-   public abstract boolean test(int a);
-   }
+   1. consumer
+      interface Consumer {
+      void accept(int a);
+      }
+   2. supplier
+      interface Supplier {
+      public abstract int get();
+      }
+   3. function
+      interface Function {
+      public abstract int apply(int a);
+      }
+   4. predicate
+      interface Predicate {
+      public abstract boolean test(int a);
+      }
 
 Assignment - resources/companies.txt
 
 Note: for loop and enhanced for loop is an external loop. forEach is an internal loop. forEach() was introduced in java 8
 forEach() is a default method added to Iterable interface in Java 8. It takes Consumer object as input. It executes accept() in Consumer interface for each element in the List.
 ex. ForEach.java
+
+Note: Function.identity() is same as e->e. It takes an input and returns the same element.
+Note:
+If there is only 1 statement in the lambda expression: we can remove flower braces. We can also remove the return keyword if the only statement happens to be a return statement.
+
+3. Method reference: Short hand of already short hand Lambda expressions
+   System.out::println() // :: means method reference
+   Note: System.out::println is a replacement for e -> System.out.println(e)
+   3 types:
+
+   1. constructor reference - used when a new instance(Object) is being returned
+   2. static method reference
+   3. instance method reference - 2 types:
+   arbitrary object method reference, particular object method reference
+   <!-- 4. direct-instance reference method - using existing class -->
+
+4. Stream API - vvvv Imp
+   Returns Stream<T>.
+   source: set of data (it can be collection, array, I/O stream....)
+
+   Intermediate operations are optional and there can be multiple intermediate operations.
+   On the data, you can apply **intermediate operations:**
+
+   1. filter,
+   2. map,
+   3. flatMap - it is actually not a Map- it is for List of Lists - [[1,2], [3,4]] -> [1,2,3,4]
+   4. distinct,
+   5. sorted
+   6. skip(n) - skips first element till nth index (including nth index) element
+   7. limit(n) -
+   8. peek(e -> System.out.println(e)) - used for debugging
+
+   And then you can apply **terminal operations -**
+
+   1. collect - collects into a bucket using Collectors - .collect(Collectors.toList()), collect(Collectors.toSet()),collect(Collectors.toMap(k,v)), collect(Collectors.joining("-")) - returns String and here "-" is the delimeter, it joins all the elements with the delimeter between all the elements. Collectors.partitioningBy(), Collectors.groupingBy(e -> e.key()),
+      Collectors.allMatch(), noneMatch(), anyMatch() - shortcircuit operations - they return Boolean(true/false)
+   2. min,
+   3. max,
+   4. count...
+
+   In Collectors.toMap(k,v), suppose if there are duplicate keys, it gives error. So, we need to manage this conflicts. So, if we want to replace the old value of the key with new value for the duplicate keys:
+   Ex. Map<String, Integer> m = names.stream()
+   .collect(Collectors.toMap(e -> e, e -> e.length(), (oldvalue, newvalue) -> newvalue))
+
+   Collectors.partitioningBy() - checks the elements on a condition and returns a Map<Boolean, List<T>> with 2 elements:
+   true, []
+   false, []
+
+   Collectors.groupingBy() - grouping all elements based on some key which have same value together and returns a Map<DatatypeOfKey, List<T>-
+   ex. [A(aa) , B(bb), C(cc), D(dd), E(aa), F(bb)] - groupBy - [aa, ] , [bb, bb] , [cc] , [dd]
+
+   Note: What if no element gets filtered:
+   Optional<String> nameOptional = names.stream ()
+   .filter (e -> e.startsWith ("A"'))
+   .findAny();
+   System.out .println (nameOptional); // Optional.empty if element is not present
+   System.out.println (nameOptional.isPresent ()? nameOptional.get(): "Not Found");
+
+   String nameOptional = names.stream ()
+   .filter (e -> e.startsWith ("A"'))
+   .findAny()
+   .orElse(null)
+
+   filter takes predicate as input
+   map takes function as input
+
+   ex. numbers.stream()
+   .filter(e -> e%2==0) // intermediate operation
+   .map(e -> e\*2) // intermediate operation
+   .forEach(System.out::println) // terminal operation
+
+   ArrayList<Integer> numbers = Arrays.asList(1,2,3,4,5);
+
+   Properties of stream -
+
+   1. Can only go from beginning to end
+   2. Once you use it, you can no longer use the same stream
+   3. It will not affect the source
+
+Note: Streams are lazy. Since, if there is no terminal operation, it does not perform any of the intermediate operations. Until it encounters terminal operation, it does not perform intermediate operations.
+
+Styles of coding -
+
+1.  Imperative - loops, iterators
+2.  Declarative - streams
+
+**Comparator vs Comparable**
+Comparator is a Functional Interface (FI)
+Comparator - compare(,) - returns int -
+
+      1.  public int compare(String s1, String s2) {
+         return s1.compareTo(s2);
+         }
+
+Comparable - compareTo() -> for strings: s1.compareTo(s2) -> compares with the current instance. So, it takes only one argument.
+Ex.
+Collections.sort(names); // natural order
+// natural order using comparator
+Collections.sort(names, (o1, o2) -> o1.compareTo(o2));
+// reverse order
+Collections.sort(names, (o1, o2) -> o2.compareTo(o1));
+// reverse order for integers
+Collections.sort(names, (o1, o2) -> o2-o1);
+
+Note:
+If the list is small, use List.of()
+Otherwise, use Arrays.asList()
+
+Note: Convert array of primitive type to List
+int[] primitiveArray = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+List‹Integer> integerList = Arrays.stream(primitiveArray).boxed().collect(Collectors.toList());
+
+There are 2 types of streams:
+
+1. bounded - fixed number of elements - List
+2. infinite - 2 methods are used to generate it- it is like infinite loop
+   1. Stream.iterate() - Ex. Stream.iterate(0, i->i+1).forEach(sop) - 0,1,2,3,4.....
+   2. Stream.generate() - Ex. Stream.generate(() -> new Random().nextInt(1000)).limit(20).collect(Collectors.toList()); // 767, 988,......
+
+`**Spring**`
+
+1. .jar file - java archive. It is a collection of .class files.
+
+Suppose you want to export all the files in your project. Then you can create a jar file which contains class files of all the files in your project and in a different project, you can add this jar file as a dependency in the build path.
+
+2. .war file - web archive. It is a collection of different type of UI files (.html, .js, .css, .properties, .xml, .java .....)
+
+3. .ear file - enterprise archive. Same like war but has additional complex files like .ejb, .bpal.....
+
+- it is heavy weight file
+
+**maven | gradle** -
+
+1. build management tool - they are used to package (build) the entire application and create jar/war/ear file.
+2. It also takes care of dependency management.
+
+Maven has a central repository (Maven repository on internet) - (remote repository) - which contains .jar files of different libraries.
+
+local repository -(.m2 folder - in Windows, it is present in C/Users) - repository on our machine - when you build the app, when installing the dependencies, first it will check this folder, if not, it will check private repository of the company, if not, then maven will fetch them from remote repository (central repo) and place them in this folder and then fetch from this folder.
+
+building - like compile - creating jar file
+
+libraries - have .jar files - which have .class files
+**pom.xml:**
+Every maven project has this file.
+If there is pom.xml file, that means it is a maven project.
+It contains list of dependency
+pom - project object model
+
+Each dependency has:
+group id - com.something.something
+artifact id - artifact -> project name
+version number - major.minor.patch
+
+Spring is a framework
+
+- it is a collection of jars
+
+**UI application architecture:**
+Frontend(UI) - Backend -(asks for data from)- Database
+or
+Frontend - Backend -(asks for data from) - Another webservice
+
+This anotehr webservice can have different tech stack like .Net. So, we need protocol for these 2 web services to communicate with each other.
+
+**Protocols for communication between 2 webservices:**
+
+1. SOAP - Simple Object Access Protocol - xml format - .wsdl/ .xsd files
+2. REST - Representational State Transfer - JSON format (JavaScript Object Notation)
+   REST endpoint example - /hello
+
+wsdl file- web service description language - xml file which contains how many input and output variables are needed and their datatypes
+
+Any page on the web will have an IP address & port and this IP address will be mapped to a domain name using DNS mapping.
+
+**HTTP status codes:**
+1xx - shows some information
+2xx - success
+3xx - redirection error
+4xx - client side issue
+5xx - server side issue
+
+HTTP methods - CRUD operations -
+Create - POST
+Read - GET
+Update - PUT
+Delete - DELETE
+
+**Path params and Query params In a GET request:**
+
+1. www.bestbuy.com/123/details -> 123 is /{productID}/ - 123 is called Path param/ Path variable
+2. www.bestbuy.com/details?productid=123 - 123 is called Query param/ Request param
+
+Note: To securely send data using POST instead of sending it through URL, we send it through Request Body.
+
+All the compiled files will be placed in target folder
+**spring commands:**
+clean
+package
+install
+compile
+
+mvn -install -> To check maven version
+
+mvn clean -> deletes target folder
+mvn compile -> checks if all the classes can be compiled or not
+mvn package -> compile all the classes
+mvn install -> compiles all the classes and places the jar file in .m2 folder - useful when you're using this project as a dependency in another project
+mvn clean package -> cleans and packages
+mvn clean install -> cleans and installs
+
+Last 2 commands are most used
