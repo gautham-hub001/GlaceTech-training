@@ -11,7 +11,7 @@ Hint: List<Employee>
 
 -----Try using stream API
 4. Create a Map data structure with EIN as Key and List<Employees> as value.
-Map<Integer, List<Employee>> ein, list of employees
+Map<Integer, List<Employee>> ein, list of employees -> last field in employees.txt is company id
 
 5. Create a Map data structure with EIN as Key and Company as value.
 Map<Integer, String> -> ein, name
