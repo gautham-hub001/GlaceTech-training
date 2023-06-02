@@ -542,11 +542,6 @@ Read - GET
 Update - PUT
 Delete - DELETE
 
-**Path params and Query params In a GET request:**
-
-1. www.bestbuy.com/123/details -> 123 is /{productID}/ - 123 is called Path param/ Path variable
-2. www.bestbuy.com/details?productid=123 - 123 is called Query param/ Request param
-
 Note: To securely send data using POST instead of sending it through URL, we send it through Request Body.
 
 All the compiled files will be placed in target folder
@@ -560,9 +555,225 @@ mvn -install -> To check maven version
 
 mvn clean -> deletes target folder
 mvn compile -> checks if all the classes can be compiled or not
-mvn package -> compile all the classes
+mvn package -> compile all the classes and also place the jar file in target folder
 mvn install -> compiles all the classes and places the jar file in .m2 folder - useful when you're using this project as a dependency in another project
 mvn clean package -> cleans and packages
 mvn clean install -> cleans and installs
 
 Last 2 commands are most used
+
+Dependencies used: Spring Web
+
+The java version mentioned in the pom.xml and the java version of the machine where the app is being compiled must be same.
+
+default IP address of localhost: 127.0.0.1
+default port of tomcat: 8080
+To change the port:
+In application.properties: -> this file is used for configurations
+server.port=8081
+
+SDLC:
+requirements
+development env -> local testing/ JUnit testing
+testing: dev, SIT (System Integration Testing)/QA (Quality Assurance) -> QAs will test here, UAT (User acceptance testing) -> Business users test here
+pre-prod -> Beta users test here
+prod
+
+Configurable properties: properties that change for every environment -> placed in application.properties file
+Dev env, SIT env, QA env will all have different DBs. Each DBs will be serving on different ports.
+
+Profiles:
+application.properties -> default profile
+application-<>.properties:
+application-local.properties
+application-dev.properties
+application-qa.properties
+application-uat.properties
+application-prod.properties
+
+To change profile in Intellij:
+Goto Add configuration:
+click on +
+select maven
+under profiles: mention local/dev/qa/uat/prod whichever one you want to run as the profile
+
+Code structure:
+Controller (endpoint) - Service (Business logic) - Repository - DB
+or
+Controller (endpoint) - Service (Business logic) - another Web-service (SOAP/ REST) - DB
+or
+Controller (endpoint) - Service (Business logic) - Message queue (kafka) - DB
+
+Different packages for each of these should be created: controller, service, repository
+
+Reading values from application.properties:
+In application.properties:
+db.name="mydb ipaddress"
+
+In code:
+@Value("${db.name}")
+String dbname;
+
+**Path params and Query params In a GET request:**
+
+1. www.bestbuy.com/details/123 -> 123 is /{productID}/ - 123 is called Path param/ Path variable
+   @GetMapping("/details/{id}")
+   public String details1(@PathVariable Integer id){
+   return "Id: " + id;
+   }
+2. www.bestbuy.com/details?productid=123 - 123 is called Query param/ Request param
+   @GetMapping("/details")
+   public String details2(@RequestParam Integer id){
+   return "Id: " + id;
+   }
+
+   If you want to send multiple attributes, you use &.
+   **POST request:**
+   Note: It is not compulsory to send data if you're using POST/GET request. It is just expected that you send data when you're using POST, since it is a Create request.
+   Data can be sent through two ways:
+
+3. Headers -
+   headers:
+   {
+   "customName" : "John"
+   }
+   @PostMapping("/details")
+   public String details_post(@RequestHeader("customName") String name){
+   return "Id: " + name;
+   }
+4. Request body
+   body - JSON -
+   {
+   "address1": "a1",
+   "address2": "a2",
+   "address3": "a3",
+   "state": "knjad",
+   "city": "abcd",
+   "zipcode": "1321"
+   }
+
+   @PostMapping("/details")
+   public Address details_post(@RequestBody("customName") Address addr){ // all the variables in this class (Address) need to be passed
+   return address;
+   }
+
+**DELETE request**
+Same like GET request, we can send id through Query param/ PathVariable
+Suppose we're sending the id of the record that we need to delete through query param:
+@DeleteMapping("/details")
+public String details2(@RequestParam Integer id){
+return "Deleted record";
+}
+
+**PUT request**
+Same like POST request, we need to send through header/request body which has all the values to which a record needs to be modified:
+eg. Using request body:
+@PutMapping("/details")
+public String details2(@RequestBody Address add){
+return "updated the record";
+}
+
+Swagger:
+Suppose you're using a web-service to get/post data and it has multiple endpoints. To know what those endpoints are and what datatypes they're expecting and what data they're going to return, they provide all of these details through Swagger_url.
+
+Previously, spring had Swaggerfox, which had 2 dependencies that you need to add (same dependency name but different artifact IDs):
+
+1. Swagger2
+2. Swagger_ui
+
+@EnableSwagger2()
+
+Now, you can just add 1 dependency:
+springdoc_Openapi_starter_webmvc_ui -> artifact name
+
+@OpenApiDefinition(info=@Info(title="Company API", version="1.0.0")) -> This is added at the Main class, i.e, below @SpringApplication()
+
+Swagger endpoint will be automatically created:
+http://localhost:8080/swagger-ui/index.html
+or
+http://localhost:8080/swagger-ui.html
+
+Swagger UI sort of shows like documentation of all the endpoints of your website. You can use this page to view and also execute the requests directly there. It will also show you the curl commands that it is executing to get the response.
+
+CURL - Client URL
+
+**Missed class - May 30**
+
+Dependency injection:
+
+1. Field injection: @Autowired above variable
+2. constructor injection - @Autowired above a parameterized constructor
+3. Setter injection
+
+@Qualifier - if there is an interface and there are multiple implementations of it
+
+Stereotype annotations:
+
+1. Component - To let Spring know that a class is available for injection, we add @Component on top of the class. For example we can use this in Service classes. But it will be better to use @Service for Service classes.
+2. Controller
+3. Service
+4. Repository
+
+**Converting String to JSON object/ JSON object to String:**
+Suppose you call a web service(REST endpoint) from another web service(REST endpoint), we might get the response as String but it is actually a JSON object/ List of objects.
+
+To convert from String to JSON objects/ List of JSON objects, we can use ObjectMapper.readValue(stringValue, new TypeReference<List<Employee>>(){})
+
+To convert from JSON object/ List of JSON objects to String, we can use ObjectMapper.writeValueAsString(employeesObject) // check once
+
+**Scopes:**
+singleton(default) and prototype scopes are most used and sometimes request scope is used.
+ex. @Scope(value="prototype")
+
+1. singleton scope - for spring, default scope is singleton. For any injection(field/setter/constructor), it will only create one instance and wherever you inject, it will return the same object.
+2. prototype scope - every time you request for an instance, it will create a new instance and return it.
+3. Request scope - for any bean under the same request(HttpRequest), one instance will be created and the same instance will be used
+4. Session scope - for any bean under the same session, one instance will be created and the same instance will be used
+5. Application scope - for any bean under the same Application context, one instance will be created and the same instance will be used
+6. Websocket scope -
+
+Session is created to maintain state(storing attributes) of the user.
+
+**Exception Handling in Spring boot applications:**
+If any runtime exception occurs in the backend(spring), spring will not send the user what exception occured. It will only send 500 Internal Server error but it doesnot give exact reason to the user.
+
+Suppose you have a table in database with 1 column having UNIQUE constraint. But if you're trying to insert duplicate elements, it will give you UniqueConstraintException.
+
+If there is no handler, it will send 500 Internal Server error. Otherwise, it will first check if there is any @ControllerAdvice and check if there is any handler for that exception and call it.
+All the excpeptioms are handled using:
+
+1. @ControllerAdvice - class level - on top of your exception handler
+2. @ExceptionHandler(ExceptionName.class) - method level - your exception handler should extend ResponseEntityExceptionHandler and you should write a method which returns ResponseEntity<String>
+
+Mockito:
+All the things for which you use @Autowired, you can mock using @Mock
+JUnit - @Test
+
+**JPA:**
+DataBase servers - MySQL, Oracle, PostGres.... All these will have different kind of drivers.
+Previously, **JDBC** (Java to DataBase Connectivity) was used connecting java to database. Steps in JDBC:
+
+1. load and register drivers(whichever SQL server you're going to connect to)
+2. Establish connection (connection URL, username, password)
+3. write SQL statements (SELECT, UPDATE, DELETE)
+4. execute SQL statements
+
+This all was done before **ORM** (Object Relational Mapping) came into picture.
+ORM - Data JPA, Hibernate
+In ORM, you don't need to write SQL statements and execute them. ORM will generate them in the background.
+Object - classes - they exist in Java
+Relational - table - they exist in Database
+Mapping - Mapping between classes and tables.
+
+Entity - corresponding classes of tables are called as Entities - @Entity
+@Entity
+class Person {
+private String fName;
+private String lName;
+private String email;
+}
+
+Table - with columns:
+fName
+lName
+email
