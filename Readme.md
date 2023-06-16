@@ -569,8 +569,20 @@ The java version mentioned in the pom.xml and the java version of the machine wh
 default IP address of localhost: 127.0.0.1
 default port of tomcat: 8080
 To change the port:
-In application.properties: -> this file is used for configurations
 server.port=8081
+In application.properties: -> this file is used for configurations
+We can also use .yaml file for configurations. yaml more human readable.
+Ex.
+In application.properties:
+server.port=8081
+project.owner.name=gautham
+
+In .yaml:
+server
+--port: 8081 -> here I have added -- instead of space. 2 spaces are added.
+project
+--owner -> 2 spaces
+----name:gautham -> here there are 4 spaces total
 
 SDLC:
 requirements
@@ -710,9 +722,9 @@ Dependency injection:
 Stereotype annotations:
 
 1. Component - To let Spring know that a class is available for injection, we add @Component on top of the class. For example we can use this in Service classes. But it will be better to use @Service for Service classes.
-2. Controller
+2. Controller - It uses DTO (Data Transfer Object). DTOs will be returned to the client.
 3. Service
-4. Repository
+4. Repository - It uses Entity object/ DAO (Data Access Object) - You should not send this object as it is to service layer since it should not be revealed to the client. So, we use a Mapper which will take DAO(Entity) and returns DTO.
 
 **Converting String to JSON object/ JSON object to String:**
 Suppose you call a web service(REST endpoint) from another web service(REST endpoint), we might get the response as String but it is actually a JSON object/ List of objects.
@@ -728,7 +740,7 @@ ex. @Scope(value="prototype")
 1. singleton scope - for spring, default scope is singleton. For any injection(field/setter/constructor), it will only create one instance and wherever you inject, it will return the same object.
 2. prototype scope - every time you request for an instance, it will create a new instance and return it.
 3. Request scope - for any bean under the same request(HttpRequest), one instance will be created and the same instance will be used
-4. Session scope - for any bean under the same session, one instance will be created and the same instance will be used
+4. Session scope - for any bean under the same session, one instance will be created and the same instance will be used. It is from login to logout.
 5. Application scope - for any bean under the same Application context, one instance will be created and the same instance will be used
 6. Websocket scope -
 
@@ -743,23 +755,33 @@ If there is no handler, it will send 500 Internal Server error. Otherwise, it wi
 All the excpeptioms are handled using:
 
 1. @ControllerAdvice - class level - on top of your exception handler
-2. @ExceptionHandler(ExceptionName.class) - method level - your exception handler should extend ResponseEntityExceptionHandler and you should write a method which returns ResponseEntity<String>
+2. The class also needs to extend ResponseEntityExceptionHandler
+3. @ExceptionHandler(ExceptionName.class) - method level - your exception handler should extend ResponseEntityExceptionHandler and you should write a method which returns ResponseEntity<String>
 
-Mockito:
+@ComponentScan - spring will scan from the base package and search for all classes which are declared using @Component
+
+**Mockito:**
 All the things for which you use @Autowired, you can mock using @Mock
 JUnit - @Test
 
 **JPA:**
-DataBase servers - MySQL, Oracle, PostGres.... All these will have different kind of drivers.
+DataBase servers - MySQL, Oracle, PostGres, SyBase.... All these will have different kind of drivers.
 Previously, **JDBC** (Java to DataBase Connectivity) was used connecting java to database. Steps in JDBC:
 
-1. load and register drivers(whichever SQL server you're going to connect to)
+1. register and load drivers(whichever SQL server you're going to connect to)
 2. Establish connection (connection URL, username, password)
 3. write SQL statements (SELECT, UPDATE, DELETE)
 4. execute SQL statements
+5. Results will be returned as ResultSet.
+
+Disadvantages of using JDBC:
+you write your own queries. Suppose you have to shift from MySQL to Oracle db, you'd have rewrite all the queries to match Oracle DB's syntax.
 
 This all was done before **ORM** (Object Relational Mapping) came into picture.
 ORM - Data JPA, Hibernate
+JPA Specification - specification (list of interfaces)
+Hibernate - is a framework which implemented JPA specifications.
+
 In ORM, you don't need to write SQL statements and execute them. ORM will generate them in the background.
 Object - classes - they exist in Java
 Relational - table - they exist in Database
@@ -777,3 +799,337 @@ Table - with columns:
 fName
 lName
 email
+
+For the ORM to uniquely identify each record, there needs to be a Primary Key. Primary Key (Unique, Not NULLL) is mandatory for ORM.
+
+To declare a column as primary key:
+
+1. we need to declare it as NOT NULL, auto_increment.
+2. Also mention in the end that the column is PRIMARY KEY: primary key (address_id)
+
+To declare a column as foreign key:
+
+1. we need mention in the end that the column is FOREIGN KEY using references
+
+Mapping multiple tables:
+Table_1 Company:
+c_id, c_name, c_ein, c_ticker, c_address_id
+
+create table company (
+c_id int not null auto_increment,
+c_name varchar(100),
+c_ein int,
+c_ticker varchar(10),
+c_address_id int,
+primary key c_id,
+foreign key (c_address_id) references address(address_id)
+);
+
+Note: address_id is the foreign key in the company table. Primary key of One table can be foreign key in another table
+
+Table_2 Address:
+address_id, add1, add2, add3, city, state, zipcode
+
+create table address (
+address_id int not null auto_increment,
+add1 varchar(100),
+add2 varchar(10),
+add3 int,
+city varchar(100),
+state varchar(100),
+zipcode int,
+primary key address_id,
+);
+
+The mapping between these tables can be 1:1 (one-to-one)
+
+Q. Insert values into address table?
+insert into address(add1, add2, add3, city, state, zipcode) values('a1', 'a2', 'a3', 'djn', 'an', 12345);
+
+Q. Get distinct cities in address table?
+select distinct city from address;
+
+Q. Updating record
+update company set column_2 = 'jnada' where companyId=3;
+
+Q. Mapping / Join. Give company id, company name, address id, address zipcode?
+The two tables can be joined using the common column - address_id
+
+select c.c_id, c.c_name, a.address_id, a.zipcode from company c join address a on c.c_address_id = a.address_id;
+
+Q. Similarly we can also perform join on 3 tables?
+select
+e.e_full_name, c.company name, c.compoany ein, a address 1, a.zip
+from
+employee e join company c on e.company_id = c.company id
+join
+address a on e.emplovee_address_id = a address id;
+
+Note: Join by default is inner join.
+
+Q. Difference between drop, truncate, delete?
+Drop - drop an entire table : drop table employees;
+truncate - table will be there but all the records will be deleted : truncate table employees;
+delete - only a particular record will be deleted.
+
+Q. UNION vs UNION ALL
+Union joins records and doesnot return duplicate records
+Union all joins records and returns duplicate records too.
+
+Associations between tables:
+1-1
+1-many
+many-1
+many-many
+
+Annotations in Spring Data JPA:
+
+1. @Id - to declare an attribute as primary key. To declare it as not null, we use nullable=false
+2. @Entity
+3. @Table() - used when class name and table name are different
+4. @Column(name = "") - by default variable name is given in camel case (createdDate) and this will be mapped with column called as created_Date. If they're different, we need to use @Column annotation.
+5. @GeneratedValue(strategy=GeneratedType.Auto) - It is used on id attribute. This is similar to AUTO_INCREMENT in JDBC.
+
+   GeneratedType - 4types:
+
+   1. Auto - depending on the type of DB, it will automatically select either Identity/ Sequence.
+   2. Identity - similar to AutoIncrement
+   3. Sequence - suggested to use - There is another sequence column in another table which has rows with values : 1,2,3,4.... These will point to rows in the original table
+   4. Table
+
+6. @Query
+
+**Heirarchy of JPARepository:**
+Repository
+CrudRepository (extends Repository) - used when there are only C,R,U,D operations to be performed
+Pagination&sortingrepository (extends CrudRepository) - suppose you have 500 pages to load but initially you only want to laod first 5 pages, you can extend this repository.
+JPARepository (extends Pagination&sortingrepository) - used to write customized queries (JPQL) - @Query
+
+JPQL - Java Persistence QUery Language
+
+Adding database to our project:
+
+1. Add spring boot starter data jpa dependency to pom.xml - for mysql or any other database
+2. Or add h2 dependency if you want to use in-memory database. H2 data will be deleted when server is stopped.
+3. Configurations (application.properties):
+   sring.datasource.url=jdbc:h2:mem:testdb
+   spring.datasource.driverClassName=org.h2.Driver
+   spring.datasource.username=sa
+   spring.datasource.password=
+
+   spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+   **\ Note: vvv imp\*** **Dialect** - kind of like database language. If you're shifting from MySQL to Oracle DB. You only need to change here to let the ORM know what database language you're going to use so that it will generate queries accordingly.
+
+   **Optional configurations:**
+   spring.h2.console.enabled=true -> If this is enabled, h2-console will be available
+   spring.h2.console.path=/h2-console
+   spring.jpa.show-sql=true -> SQL statements will be printed into the console, if this is enabled.
+   spring.jpa.properties.hibernate. format_sql=true -> SQL statements that are being printed into the console will be formatted. Otherwise, they will be printed in a single line.
+
+Repository -
+interface EmployeeRepository extends JPARepository<Employee, Long> {} Employee is Entity name. Long is the data type of primary key.
+
+**Convention:**
+For every Table, there will be a corresponding Entity (class)
+For every Entity, there will be a corresponding Repository.
+Ex.
+Employee table -> Employee class -> EmployeeRepository
+
+**Operations in Repository given by Hibernate:**
+
+1. Whenever we use employeeRepository.save(employee) in service layer, hibernate will generate SQL insert statement. -> Create operation
+2. .findById() -> Read operation. It throws exception. So, it is optional. We can use .get()
+3. .deleteById() -> delete operation
+
+Note: If you use .save() on an existing record again using same primary key, then it will update the record. If the record does not exist, it will create new record.
+
+Suppose you want to search by firstName or something like that, then you need to write custom queries:
+**Custom Queries (JPQL queries):**
+@Query ("SELECT e FROM Employee e WHERE e.firstName = :fName") -> :fName, : is called as dynamic replacement.
+List<Employee> findByName (@Param("fName") String firstName);
+Note: Dynamic replacement can be used along with @Param in the method declaration.
+
+// or we can use positional params
+@Query ("SELECT e FROM Employee e WHERE e.firstName = ?1") -> :fName, : is called as dynamic replacement.
+List<Employee> findByName (String firstName);
+
+Hibernate will also convert this query to generate corresponding query in MySQL/ Oracle DB or anyother DB that you've configured.
+Note: Some queries are database specific, for such queries you need to write the query manually using nativeQuery=true and you'd have to write using the exact column names from the database. So, native queries are DB dependent.
+
+Note: For Update query using JPQL (@Query), we need to add another tag: @Modifying on top of @Query and we also need to add @Transactional tag on the method at service layer.
+
+**Imp**
+**@Transactional** is used because suppose if the query is modifying records in multiple records, and if the data gets modified in some tables and if there is any error in modifying record in one/ multiple tables; then there is data inconsistency between the tables. So, if we use @Transactional at service layer, it makes sure that all the records will be rolled back if there is failure while updating record in any of the tables.
+
+**DTO(Data Transfer Object)**
+Since your Entity is closely coupled with database, you should not let user know the column names of the tables in the database. So, you'll generally create EmployeeDTO which contains different field names and when you ask user for data (like using RequestBody), you'll use this object and you'll map it when the object is passed to repository layer.
+
+**Using MySQL Dialect:**
+
+1. add dependency (pom.xml): mysql-conenctor-j
+2. add configuration (application.properties):
+   # database configuration
+   1. spring.datasource.url=jdbc:mysql://localhost:3306/JCByBharath -> JCByBharath is the schema name
+   2. spring.datasource.username=root
+   3. spring.datasource.password=JCBharath@2023
+   4. spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+   # Hibernate configuration
+   1. spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
+   2. spring.jpa.hibernate.ddl-auto=update # depending on the table status (create (used for the first time)/ create-drop (used in testing. Whenever appm starts it creates the tables and when it is stopped, it deletes the tables) / validate / none (used in production) / update)
+
+**JUnit**
+For Unit tests using JUnit:
+
+We used @Test on top of method
+We use same package structure as source code.
+Steps:
+
+1. You create object of the actual class and pass some test value to the each of the methods of the object in seperate test methods.
+2. use assertions to test the result returned : assertEquals(), assertNotSame(), assertNotNull(), assertTrue()....
+
+In JUnit, if a method does not return anything, you can not test it. But you can do it in Mockito.
+
+There are changes between JUnit4 and JUnit5:
+
+1. JUnit4 does not support Java 8 or greater
+   JUnit5 supports Java 8 or greater
+2. In JUnit4, everything was clubbed into one jar and we add that to our external libraries. But in JUnit5, they've split it into multiple modules like Jupyter module, Vintage module... We generally use Jupyter module.
+3. Some changes were also made like BeforeClass was changed to something else....
+4. JUnit4 uses @RunWith(MockitoJUnitRunner.class), JUnit5 uses @ExtendWith(MockitoExtension.class)
+
+**Mockito**
+Add dependencies:
+
+1. mockito-core
+2. mockito-junit-jupyter
+
+For all the classes that are injected (i.e, the ones which are not actually created but are injected (@Autowired) ), you can use Mockito to mock them.
+
+Here also, We use @Test on top of method
+Here also, we use same project structure.
+
+Steps:
+
+1. Use @InjectMocks instead of creating an object of the class you're going to test.
+2. Mock all the objects that injected(@Autowired) using @Mock
+3. If the method is calling some other method, then Prepare dummy return value and use doReturn().when().method() or when().thenReturn() to return this dummy value.
+4. For each scenario, we write seperate tests(methods) (like if a method is going to give multiple exceptions, you write seperate tests for each of the exceptions of the method along with tests for each of the return values of the method).
+5. verify any function calls being made using verify().
+6. Write assertions to check return value of the method.
+
+any(Employee.class) ->any instance of Employee class. Or you can use new Employee().
+Note: Suppose your method is calling other methods using static values like 10, "adn"... you need to use equivalent: eq(10), eq("adn)...
+
+Note: Suppose if the dummy return value is supposed to be void, we can directly use doNothing() instead of doReturn()
+
+Argumentcaptor
+Suppose if your argument value gets changed and you are passing that argument to another method and you want to check the value of the argument with which this method is being called, you can use Argumentcaptor.
+
+**Jenkins**
+It has multiple stages in its pipeline.
+It will have a hook on your Git repo. So, whenever you push your code, it will be invoked.
+
+Boomer
+
+SonareQube
+Rules like:
+
+1. If you have very long nested if
+2. if your method is too lengthy (too many lines)
+3. If there are any vulnerabilities etc....
+
+We can add SonarQube plugin to intellij
+
+**Associations between tables:**
+consider two tables: Employee, Address
+
+1. 1-1 - when each employee only has one address
+   @OneToOne - gives a default name to the foreign key column
+   @JoinColumn - if you want to rename the foreign key column name. If you do not give this, by default it is secondarytablename_primarykeyofsecondarytable_id
+
+   Unidirectional: If you create a column only on one side (@onetoone only in one class)
+   Bidirectional: If you create a column on both sides (@onetoone in both classes)
+
+2. 1-many - when each employee only has one or more addresses
+   In employee class:
+   @OneToMany(mappedBy="employee")
+   private List<Address> eAddresses;
+
+In Address class:
+@ManyToOne
+@JoinColumn(name="fk_emp_id")
+private Employee employee; // THis variable name is mentioned in mappedBy in Employee class.
+
+3. many-1: same as onetomany.
+
+4. many-many:
+   Suppose there are two tables - Employee, SkillSet
+   One employee can multiple skillset and one skillset can be present in multiple employees
+   Note: We can't achieve Many to Many on two tables since we don't know where to put the foreign key. We will create another table which is a temporary table called as Joining table/ Junction table:
+   emp_skillset_mapping_table with two foreign keys: emp_id, skillset_id
+
+   For creating the temporary table, we use: @JoinTable
+
+   In employee class:
+   @ManyToMany(mappedBy="employee")
+   @JoinTable(name="emp_skillset_mapping_table", joiningcolumn="emp_id", inversejoiningcolumn="skillset_id")
+   private List<Address> eAddresses;
+
+   In Address class:
+   @ManyToMany
+   @JoinColumn(name="fk_emp_id")
+   private Employee employee; // THis variable name is mentioned in mappedBy in Employee class.
+
+Fetch Type:
+
+1. Eager loading/ early loading - by default when you're joining , it'll fetch all the data all at once - reduces performance -
+2. Lazy loading - data is fetched only when you ask for it, query will only be generated only when you need it. Initially, it'll take time but most probably you'll use cache, so later on it'll be faster - sometimes increases performance
+
+Cascading type - suppose you do some operation on one table, does it need to affect another also or not.
+
+1. ALL - for all CRUD operations, it'll by default apply all the same operations on the other table too. You should be careful because if you delete, it'll delete in other table too
+2. PERSIST - only restricted for save operation (only insert operation).
+3. REMOVE - only for delete operation
+4. DETACH
+5. MERGE
+
+**Cache:** It is a memory.
+Stores using id and value.
+For a request, If the data is available in the cache, it is directly returned. Otherwise, it is fetched from database and then returned.
+Types:
+
+1. EHCache.
+2. Redis
+
+It is used in service layer.
+
+3. @EnableCaching
+4. @Cacheable
+5. @CacheEvict - Used for Database delete operation
+6. @CachePut - Used for Database update operation
+
+Note: Instead of writing lot of boiler code for constructors, getters and setters, we can use lombox dependency:
+@Getter - integrates getters for all attributes.
+@Setter
+@NoArgsConstructor - default constructor
+@AllArgsConstructor - parameterized constructor with all args
+
+DBBrowser extension can be used in Intellij to access and write sql queries in intellij itself.
+
+Mapper: Mapper class has method which takes DTO object, creates a DAO object and returns it.
+Note: In service class file, you should not write like 100 lines of code, you should create another helper class which will return the required object to service class.
+
+1.  mapping forward: dao to dto
+2.  mapping backward: dto to dao
+
+Design patterns:
+
+1. Builder pattern - For example while writing setter, if you return the object. It is called builder pattern.
+   Ex. Checkout forward mapping in EmployeeMapper and EmployeeDto.
+
+Invoking one web service from another:
+
+1. HttpClient
+2.
+3. RestTemplate
