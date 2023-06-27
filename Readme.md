@@ -474,6 +474,19 @@ There are 2 types of streams:
    2. Stream.generate() - Ex. Stream.generate(() -> new Random().nextInt(1000)).limit(20).collect(Collectors.toList()); // 767, 988,......
 
 `**Spring**`
+Steps to run Spring boot project:
+1. Goto start.spring.io
+2. select maven, spring boot version, under metadata:
+   group: com.sb.inclass.api.gateway
+   artifact: sb-inclass-api-gateway
+   Java: whatever version is in your system
+3. Add dependencies
+4. Download Jar
+5. Import the folder to Intellij
+6. Under Edit configurations:
+   For build: Add Maven and under Run command: clean install
+   For running the app:  Add another configuration: Application, enter a name for this config and under Main class choose the main class
+
 
 1. .jar file - java archive. It is a collection of .class files.
 
@@ -578,10 +591,10 @@ server.port=8081
 project.owner.name=gautham
 
 In .yaml:
-server
+server:
 --port: 8081 -> here I have added -- instead of space. 2 spaces are added.
-project
---owner -> 2 spaces
+project:
+--owner: -> 2 spaces
 ----name:gautham -> here there are 4 spaces total
 
 SDLC:
@@ -610,7 +623,7 @@ select maven
 under profiles: mention local/dev/qa/uat/prod whichever one you want to run as the profile
 
 Code structure:
-Controller (endpoint) - Service (Business logic) - Repository - DB
+Controller (endpoint - i/p, o/p) - Service (Business logic) - Repository - DB
 or
 Controller (endpoint) - Service (Business logic) - another Web-service (SOAP/ REST) - DB
 or
@@ -714,7 +727,7 @@ CURL - Client URL
 Dependency injection:
 
 1. Field injection: @Autowired above variable
-2. constructor injection - @Autowired above a parameterized constructor
+2. constructor injection - @Autowired above a parameterized constructor or by declaring the variable as final and assigning it with some value using a parameterized constructor.
 3. Setter injection
 
 @Qualifier - if there is an interface and there are multiple implementations of it
@@ -763,6 +776,8 @@ All the excpeptioms are handled using:
 **Mockito:**
 All the things for which you use @Autowired, you can mock using @Mock
 JUnit - @Test
+1. @RunWith() - for JUnit 4 or below
+2. @ExtendWith() - for JUnit 4 or above
 
 **JPA:**
 DataBase servers - MySQL, Oracle, PostGres, SyBase.... All these will have different kind of drivers.
@@ -1100,14 +1115,15 @@ For a request, If the data is available in the cache, it is directly returned. O
 Types:
 
 1. EHCache.
-2. Redis
+2. Redis - just like database, it is like a server. It is in-memory. It uses HashMap. You'll add dependency and in application.properties, you'll add host, port, timeout.
+   Above method, you'll add @Cacheable(cacheNames= "universities", key="#id"). You can also check what's present in the redis using cli: keys \* to get all the keys present in redis storage.
 
 It is used in service layer.
 
 3. @EnableCaching
 4. @Cacheable
-5. @CacheEvict - Used for Database delete operation
-6. @CachePut - Used for Database update operation
+5. @CacheEvict - Used for Database delete operation, if you delete in DB, it must also be deleted in the cache.
+6. @CachePut - Used for Database update operation. if you update in DB, it must also be updated in the cache.
 
 Note: Instead of writing lot of boiler code for constructors, getters and setters, we can use lombox dependency:
 @Getter - integrates getters for all attributes.
@@ -1115,7 +1131,7 @@ Note: Instead of writing lot of boiler code for constructors, getters and setter
 @NoArgsConstructor - default constructor
 @AllArgsConstructor - parameterized constructor with all args
 
-DBBrowser extension can be used in Intellij to access and write sql queries in intellij itself.
+DBBrowser extension can be used in Intellij to access and write sql queries in intellij itself instead of instead of apps like MySQL connector.
 
 Mapper: Mapper class has method which takes DTO object, creates a DAO object and returns it.
 Note: In service class file, you should not write like 100 lines of code, you should create another helper class which will return the required object to service class.
@@ -1127,9 +1143,190 @@ Design patterns:
 
 1. Builder pattern - For example while writing setter, if you return the object. It is called builder pattern.
    Ex. Checkout forward mapping in EmployeeMapper and EmployeeDto.
+2. Singleton
+3. Factory
+4. Decorator
+5. Adapter
+6. Publisher/ subscriber - also called as observer.
 
-Invoking one web service from another:
+**Invoking one web service from another:**
 
-1. HttpClient
-2.
-3. RestTemplate
+1. HttpClient - add dependency - only synchronous
+   1. HttpClient builder - HttpClientBuilder.create().build()
+   2. Build uri using URIBuilder(url).build()
+   3. Use Httpget/ httppost on this uri.
+   4. httpClient.execute(httpget) - gives httpresponse
+   5. .getEntity() to get HttpEntity.
+   6. close the connection.
+2. WebClient - both synchronous, asynchronous
+3. FeignClient
+4. RestTemplate - deprecated - only synchronous
+
+deprecated - means this feature will not available from next or upcoming releases. 
+
+These calls can be synchronous/ asynchronous.
+Synchronous - after calling the web service, you wait for the response
+
+@Bean - During componentscan, spring will check them. So, where ever
+
+**Logging**
+In production code, you should never write system.out.println because whenever you restart the app, they get cleared.
+You should use logger, because it is stored - log statements. These statements will be rolled onto log files.
+Log levels:
+1. ALL
+2. TRACE
+3. DEBUG - generally used when debugging beta version
+4. INFO - very commonly used
+5. WARN - very commonly used
+6. ERROR - commonly used
+7. FATAL
+This is high level to low level hierarchy.
+
+In application.properties file, you mention file name along with path, log level, max file size etc.... So, it will start saving logs into that file and when the file reaches its max
+size, it will zip that file and creates another file and starts writing into that file.
+
+If you mention INFO as the log level (logging.level.root) in the file, it will only write logs from INFO level till FATAL level.
+Note: For some particular classes or sub folder, you can have different log level.
+Ex. in application.properties:
+logging.level.org.springframework.cache=INFO
+
+For whatever class you want to write the logs, you declare the logger in that class only and use it. Or you can use lombok - @Slf4j.
+Note: sensitive information (PII information - personal identifier information) should not be logged like userdetails object.
+
+ex.
+try{
+} catch(Exception ex) {
+   log.error('dfahadf', ex);
+   log.info('firstname passed {} lastname passed {}', fname, lname); // This is place holder. Better practice as compared to concatenation.
+}
+
+Note: You can also customize the print statements of the logs being printed
+
+
+What would you do if a prod (production) issue happens?
+1. Check what the issue by checking the logs
+2. try to replicate the issue
+3. check how exactly the issue happened using logger statements.
+4. find the fix
+
+Suppose you want to modify application.properties for production:
+1. first way is to change application-prod.properties file and build jar file again and deploy this - but this is not suggestible
+2. second way - for some cloud config servers - you can modify profiles - this will over-ride application.properties configuration.
+3. SCCS - Spring Cloud Config Server - it is a config server from where your code deployed server will talk with - just like rollout in FactSet- all the configuration is maintained here. Your app will pull the configuration on the fly in real time
+
+
+
+Note: Normally Stringbuilder is used when you need to append multiple strings. Stringbuffer is used when you're using multithreading. Stringbuffer is threadsafe.
+
+Threading:
+Suppose some logic needs to be executed by multiple threads, that piece of code is called as critical section. 
+You need to put this entire section inside a synchronized block so that whenever one thread is using it, it will lock 
+that section and only after it releases the block the next thread can use it.
+
+
+publisher/ consumer <-> producer/consumer <-> event streaming <-> used in kafka. This process is asynchronous communication.
+This is similar Observer design pattern.
+
+Note: Temporary Place where publisher places the data is called as topic. It is a queue where data is placed temporarily.
+Once every consumer consumes the data, it is deleted from the topic.
+
+1. In HttpClient (syncrhonous communication), after sending the data, it waits for a response. 
+2. But in Kafka (asynchronous communication), it sends data into a topic and it does not wait for a response. This is 
+   called fire and forget. 
+3. Reactive spring: uses publisher-subscriber pattern
+   Mono - kind of producer - for returning single data - ex. instead of returning String, you can use Mono<String>
+   Flux - kind of producer - stores multiple data - ex. instead of returning List<String>, you can use Flux<String>
+   Browser/postman are the consumers.
+   Steps that happen on Producer side whenever a consumer subscribes to it:
+   1. onSubscribe()
+   2. onRequest()
+   3. onNext() - in-case of Flux, this executes for each of the element.
+   4. onComplete() - executes when all of the elements are sent to the consumer.
+
+Mono and Flux concept (asynchronous communication) - is present in both Webclient and Reactive spring.
+Reactive Spring:
+1. Suppose your backend is sending a response which has multiple elements, generally you send all of it at once only 
+   after entire response is processed and ready to be sent. But in Reactive spring, you wouldn't wait until entire 
+   response is ready, you keep sending parts of the response that are processed instead of waiting for all of the
+   elements to be processed.
+2. Suppose you've submitted a form and the request went through. If you stop it by clicking on x button on the browser, the backend still 
+   continues working on it. But in Reactive Spring, the backend will stop processing the request.
+
+In edit configurations inside Intellij. You cam check Allow multiple instances. So, everytime you click on run it create and run a new instance.
+First instance will run in a new port. First one will run in a port which we have configured. Remaining ones will run in available ports.
+
+There is a limit for number of connections for each instance. In cloud, suppose an instance reaches 80% connections of its max capacity.
+It creates new instances and load balancer distributes requests to multiple instances in round robin fashion.
+WebClient
+1. synchronous call - response.block() - it waits until it gets the response.
+
+
+
+**Monolithic vs Microservices:**
+monolithic - single application having common database.
+Microservices - multiple individual applications each having seperate databases and they may have calls between them. 
+Each app should have a seperate CI/CD pipeline. There are 12 factors to make an app pure microservice. But in real world,
+we may compromise on some of them.  
+Ex. In Chase app, credit score check can be a seperate module. So, even if it is down, the whole app is still working. 
+
+
+Eureka - introduced by Netflix
+1. Service registry - Eureka server - It exists on its own. ALl the Services register here. Each client may have multiple instances. 
+   Every app instance (also called as Eureka Client) which is up and running will go and register here and
+   keeps on updating the registry every 30 secs ~ heartbeat. Eureka client will keep on communicating with Eureka server
+   informing the Eureka server that I'm running on this particular ip address and port number. Suppose you make a web client
+   request/ Rest Template request, you first go and ask Eureka server that you need this particular service, if it is available, server will 
+   return the entire registry containing IP addresses of all the instances and you use @LoadBalanced to pick one of these 
+   instances. For the first time, you place the registry in cache and for lookup in that.
+2. Service discovery - 
+
+Create new springboot app - add dependency - eureka server
+in the main application filke, add @
+Generally, port : 8761 is used.
+
+TO make existing project as eureka client
+1. pom.xml: add spring cloud dependency, eureka client dependency
+2. add @EnableDiscoveryClient tag to main class
+3. application.properties:
+   eureka.client.serviceUrl.defaultZone=http://localhost:8761/eureka -> place where you need to register
+   spring.application.name=api-gateway
+
+Note: container <-> web service
+
+**Steps inside API Gateway:**
+1. Security - Authentication, Authorization  - important feature of API Gateway
+2. Routing - Routing to corresponding container
+3. LoadBalancing - of container instances
+ex. API-GEE, Spring api gateway
+
+Dependency: Gateway
+
+One of the use case of API gateway is to hide the internal URL by mapping to the internal URL.
+In API-gateway, resource means endpoint.
+
+Suppose Our gateway is present at 8080 and user calls:
+http://localhost:8080/api/v1/employee-service/getUniversities 
+protocol - http
+ipaddress - localhost
+port - 8080
+predicate (path): /api/v1/employee-service/getUniversities
+
+In application.properties of API-gateway we add routing too:
+spring.cloud.gateway.routes[0].id=employee-service
+spring.cloud.gateway.routes[0].uri=lb://employee-service -> lb is load balanced, since we're using @LoadBalanced. Otherwise, we will use http://
+spring.cloud.gateway.routes[0].predicates=Path=/api/v1/eureka/getUniversities
+
+For the call: http://localhost:8080/api/v1/employee-service/getUniversities:
+/api/v1/employee-service/getUniversities -> this matches with our predicate.  So, gateway will map this to:
+lb://employee-service/api/v1/eureka/getUniversities
+
+Since eureka server is managing this endpoint, it will send the registry and wherever the actual service is running will
+be called (let's say port 1234): localhost:1234//api/v1/eureka/getUniversities
+
+**Circuit Breaker**
+When there are multiple web service calls (container calls) - one springboot app calls another which inturn calls another and the final
+one calls the db and finally the data is returned to client. This is called as circuit.
+states:
+1. OPEN - If there is any problem with any of the SB app, this is not success state, so, it is called open state
+2. CLOSED - If every thing is working fine (success state) - it is called as CLOSED state.
+3. Half OPEN
