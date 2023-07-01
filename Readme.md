@@ -1327,6 +1327,50 @@ be called (let's say port 1234): localhost:1234//api/v1/eureka/getUniversities
 When there are multiple web service calls (container calls) - one springboot app calls another which inturn calls another and the final
 one calls the db and finally the data is returned to client. This is called as circuit.
 states:
-1. OPEN - If there is any problem with any of the SB app, this is not success state, so, it is called open state
+1. OPEN - If there is any problem with any of the SB app, this is not success state, so, it is called open state. 
+   Even If more than like 50% calls fail, we change the state to OPEN.
 2. CLOSED - If every thing is working fine (success state) - it is called as CLOSED state.
-3. Half OPEN
+3. Half OPEN - we don't want our container to be in OPEN state for longer time since if it is in OPEN state, we would have to
+   send fallback page. After like 10 sec, we change state from OPEN to HALF OPEN. Now, half calls will be passed to the container 
+   and half calls get fallback page directly. If even in half open state, all the calls that come to the container get failed,
+   then the container is again changed to OPEN state.
+
+Typically, if one of these services is down, instead of showing Internal page error 500 code; it is better to show a 
+fallback page which shows some other page showing other products or something like that.
+
+ex. Histerics, Resilience4j
+
+Resilience4j:
+1. 3 dependencies: actuator, Resilience4j, spring aop 
+2. In application.properties: resilience4j.circuitbreaker / resilience4j.retry / resilience4j.bulkhead
+
+**Actuator**
+It is integrated in circuitbreaker project 
+It will show you statistics
+It is a spring module which has some endpoints (similar to swagger), which shows number of requests sent to a container
+
+endpoints:
+/actuator/info, /actuator/env, /actuator/health ......
+
+**AOP (Aspect Oriented Programming)**
+
+
+**Spring Security**
+There are multiple filters and servlets present between UI and controller 
+SPring security takes advantage of these filters and servlets. It also has seperate security filter. For:
+1. authentication - username, password - okta - authentication manager / authentication provider - it will have user details service or password
+   encoder. After authentication, the user will not be re-authenticated for each request. To remember the user for subsequent requests,
+   it uses security context.
+
+encoding vs encryption vs hashing
+encoding - mapping a to 1 or something like that.
+encryption - secret - for encryption & decryption we need secret key. public key, private key
+hashing - it is only one-way - you can never get the original value back from the hashed value - can be used to store
+after hashing, a hash string will be generated and you store this in the DB when you're registering as a new user.
+This hash string will have a hashvalue inside it. So, next time when you try to login using the same password, the hash string
+now generated will be different but it will have the same hash value, so when your hashing algo compares it with the DB,
+it will match and the user can login successfully.
+
+ex. popular hashing algos - PBKDF2, bcrypt (uses CPU) (most often used), scrypt (uses CPU, memory), argon2 (uses CPU, memory, threads)
+sensitive info in DB.
+2. authorization - roles
