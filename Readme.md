@@ -23,11 +23,11 @@ ABCImple a = new ABCImple();
 
 3. Inheritance -
    types:
-   single - A-B
-   multilevel - A-B-C
-   hierarchical - A-B, A-C
-   multiple - not supported in java directly
-   hybrid - not supported in java directly
+   1. single - A-B
+   2. multilevel - A-B-C
+   3. hierarchical - A-B, A-C
+   4. multiple - not supported in java directly
+   5. hybrid - not supported in java directly - diamond problem
 
 parent class / parent/ base
 child class / sub / derived
