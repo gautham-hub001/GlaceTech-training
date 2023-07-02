@@ -282,7 +282,8 @@ Java 8 (1.8)features:
    }
    }
    This is added because if there is interface I with a method add() and interfaces I1, I2, I3 also have add() with same implementation. So, it is better to implement default add() in interface I only so that we don't need to re-implement it in sub-interfaces.
-2. Functional interfaces - SAM - single abstract method - interface with only one function (method)
+   https://www.geeksforgeeks.org/default-methods-java/#
+3. Functional interfaces - SAM - single abstract method - interface with only one function (method)
    advantage of Functional interfaces - we can remove boiler plate code (like method name, return type, datatypes of arguments ) of the abstract method using lambda expression in the implementing class.
    public interface MFI {
    int add(int a, int b);
