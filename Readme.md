@@ -1001,7 +1001,7 @@ We used @Test on top of method
 We use same package structure as source code.
 Steps:
 
-1. You create object of the actual class and pass some test value to the each of the methods of the object in seperate test methods.
+1. You create object of the actual class and pass some test value to each of the methods of the object in seperate test methods.
 2. use assertions to test the result returned : assertEquals(), assertNotSame(), assertNotNull(), assertTrue()....
 
 In JUnit, if a method does not return anything, you can not test it. But you can do it in Mockito.
@@ -1048,9 +1048,8 @@ It will have a hook on your Git repo. So, whenever you push your code, it will b
 
 Boomer
 
-SonareQube
+**SonarQube**
 Rules like:
-
 1. If you have very long nested if
 2. if your method is too lengthy (too many lines)
 3. If there are any vulnerabilities etc....
@@ -1192,7 +1191,7 @@ Ex. in application.properties:
 logging.level.org.springframework.cache=INFO
 
 For whatever class you want to write the logs, you declare the logger in that class only and use it. Or you can use lombok - @Slf4j.
-Note: sensitive information (PII information - personal identifier information) should not be logged like userdetails object.
+Note: sensitive information (PII information - personal identifier information) should not be logged (like userdetails object).
 
 ex.
 try{
