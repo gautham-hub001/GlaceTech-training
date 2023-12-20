@@ -630,6 +630,10 @@ Controller (endpoint) - Service (Business logic) - another Web-service (SOAP/ RE
 or
 Controller (endpoint) - Service (Business logic) - Message queue (kafka) - DB
 
+
+Architecture:
+UI/postman/swagger/Curl command - filter chain - servlets - api gateway - controller - service - repository - database
+
 Different packages for each of these should be created: controller, service, repository
 
 Reading values from application.properties:
@@ -951,6 +955,8 @@ For every Table, there will be a corresponding Entity (class)
 For every Entity, there will be a corresponding Repository.
 Ex.
 Employee table -> Employee class -> EmployeeRepository
+
+findBy___And____()
 
 **Operations in Repository given by Hibernate:**
 
@@ -1374,3 +1380,47 @@ it will match and the user can login successfully.
 ex. popular hashing algos - PBKDF2, bcrypt (uses CPU) (most often used), scrypt (uses CPU, memory), argon2 (uses CPU, memory, threads)
 sensitive info in DB.
 2. authorization - roles
+
+
+
+**Design patterns/ SOLID principles**
+patterns - solution to a problem
+design pattern - if the pattern can be used for multiple 
+- all of them follow SOLID principles too
+
+SOLID principles - best practices that make the code more understandable and maintainable
+S - Single Responsibility of classes ex. the whole class only deals with databases / web service / kafka....
+O - Open for extension/ closed for extensions - code should be open for new features(code should be loosely coupled)
+L - Liskov substitution principle - parent classes can 
+I - Interface segregation - since interface is a contract, we should have only related stuff inside an interface.
+D - Dependency Inversion/ Inversion of control - higher level classes/modules should not depend on lower level classes/modules
+
+
+Types of design patterns:
+1. Creational pattern - best way to create objects
+      **singleton pattern** (create only one instance) - make the constructor private, private static classObject = null, create another public static method getInstance() which returns this classObject and if this object is null it assigns new object. otherwise it directly returns this object.   
+         Note: Here we are using lazy loading. We can also directly create new instance and assign it to classObject instead of null (early loading).  
+      prototype pattern (everytime it will return a new instance)
+      **factory pattern** (first you order and it'll return you the object) - client should be abstracted on how the object is created
+      abstract factory pattern - avoids even more details - it is like factory on top of factory 
+      builder pattern - 
+2. structural pattern - 
+      **decorator pattern** - suppose you have a pizza, you can choose multiple toppings on this - then some chilli flakes, and then sauce and so on....
+      ex. use case - new File()
+          new FileReader()
+          new BufferedReader() ...... -> new File(new FileReader(new BufferedReader()))
+      Adapter pattern - India to US converter 
+      ex. Converting from one class to another
+      facade pattern - instead of having client to invoke different endpoints you have in different services, you'll give client only one endpoint and you'll invoke 
+                        the actual endpoints and return the data.
+      flyweight pattern -
+      proxy pattern - 
+      composite pattern
+3. behavioural pattern - 
+      strategy pattern - 
+      iterator pattern
+      chain of responsibility - There are multiple handlers. If one handler can return the appropriate response, it will return it. Otherwise, it will call some other handler and it will return the response. 
+      observer pattern - publisher subscriber. Whoever subscribes gets notification from the supplier. It does not 
+      allocate space= of t---o
+]]]]][[]]
+PROXY patterns
