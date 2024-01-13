@@ -221,13 +221,29 @@ Collections.sort(names);
    b. LinkedHashMap
    c. SortedMap - implementation is TreeMap - sorts based on keys.
 
-ArrayList<Integer> a = new ArrayList<>();
+ArrayList<Integer> list = new ArrayList<>();
+list.add(1);
+list.add(2);
+list.add(3);
 
-1. for(Integer i : arr) {
+1. for-each  
+   for(Integer i : arr) {
    sop(i);
    }
 
-2. Iterator
+2. for loop
+   for (int i = 0; i < list.size(); i++) {
+   System.out.println(list.get(i));
+   }
+3. Iterator
+   ArrayList<Integer> list = new ArrayList<>();
+   list.add(1);
+   list.add(2);
+   list.add(3);
+   Iterator<Integer> iterator = list.iterator();
+   while (iterator.hasNext()) {
+   System.out.println(iterator.next());
+   }
 
 **ArrayList vs Vector**
 If multiple people are working on an ArrayList, the changes cannot be predicted. So, ArrayList is not thread safe(not synchronized). But Vector is synchronized. So, there is lock mechanism in Vectors.
@@ -266,6 +282,9 @@ First, it passes the key to hashing function to generate hashcode (**hashcode()*
 
 1. Chaining - linked list - used in hashmap
 2. Open addressing - element is stored in the hashtable itself.
+   a. Linear probing - you search for the next available slot by incrementing the index one by one until an empty slot is found.
+   b. Quadratic probing - incrementing the index by a quadratic function rather than a linear one. (+ 1^2, + 2^2, + 3^2......)
+   c. Double hashing - you use a secondary hash function to determine the interval between probes. This can help avoid clustering that might occur with linear or quadratic probing.
 
 Note: Interface is a contract where the implementing class needs to implement all of the methods in the interface.
 
@@ -283,7 +302,7 @@ Java 8 (1.8)features:
    }
    This is added because if there is interface I with a method add() and interfaces I1, I2, I3 also have add() with same implementation. So, it is better to implement default add() in interface I only so that we don't need to re-implement it in sub-interfaces.
    https://www.geeksforgeeks.org/default-methods-java/#
-3. Functional interfaces - SAM - single abstract method - interface with only one function (method)
+2. Functional interfaces - SAM - single abstract method - interface with only one function (method)
    advantage of Functional interfaces - we can remove boiler plate code (like method name, return type, datatypes of arguments ) of the abstract method using lambda expression in the implementing class.
    public interface MFI {
    int add(int a, int b);
@@ -324,7 +343,7 @@ Java 8 (1.8)features:
    1. consumer - the method accept takes input but does not return anything
    2. supplier - the method get does not take any input but returns something
    3. function - the method apply takes input and returns something
-   4. predicate - it is a function but it returns boolean
+   4. predicate - the method test - it is a function but it returns boolean
 
    Special cases of functional interfaces:
    BiConsumer, BiFunction, BiPredicate - all these have methods that accept two arguments
@@ -360,79 +379,125 @@ Note: Function.identity() is same as e->e. It takes an input and returns the sam
 Note:
 If there is only 1 statement in the lambda expression: we can remove flower braces. We can also remove the return keyword if the only statement happens to be a return statement.
 
-3. Method reference: Short hand of already short hand Lambda expressions
-   System.out::println() // :: means method reference
-   Note: System.out::println is a replacement for e -> System.out.println(e)
-   3 types:
+3.  Method reference: Short hand of already short hand Lambda expressions
+    System.out::println() // :: means method reference
+    Note: System.out::println is a replacement for e -> System.out.println(e)
+    3 types:
 
-   1. constructor reference - used when a new instance(Object) is being returned
-   2. static method reference
-   3. instance method reference - 2 types:
-   arbitrary object method reference, particular object method reference
-   <!-- 4. direct-instance reference method - using existing class -->
+    1.  constructor reference - used when a new instance(Object) is being returned
+        public class ConstructorMethodReferenceExample {
+        public static void main(String[] args) {
+        // Using lambda expression
+        MyInterface myInterfaceLambda = (name, value) -> new MyClass(name, value);
+        MyClass instanceLambda = myInterfaceLambda.create("Lambda", 1);
+        System.out.println(instanceLambda);
 
-4. Stream API - vvvv Imp
-   Returns Stream<T>.
-   source: set of data (it can be collection, array, I/O stream....)
+                // Using constructor method reference
+                MyInterface myInterfaceReference = MyClass::new;
+                MyClass instanceReference = myInterfaceReference.create("Reference", 2);
+                System.out.println(instanceReference);
+            }
 
-   Intermediate operations are optional and there can be multiple intermediate operations.
-   On the data, you can apply **intermediate operations:**
+        }
 
-   1. filter,
-   2. map,
-   3. flatMap - it is actually not a Map- it is for List of Lists - [[1,2], [3,4]] -> [1,2,3,4]
-   4. distinct,
-   5. sorted
-   6. skip(n) - skips first element till nth index (including nth index) element
-   7. limit(n) -
-   8. peek(e -> System.out.println(e)) - used for debugging
+    2.  static method reference
+        public class Main {
+        public static void main(String[] args) {
+        // Using lambda expression
+        MyFunctionalInterface lambdaFunctionalInterface = (message) -> StaticMethodReferenceExample.staticDisplay(message);
+        lambdaFunctionalInterface.display("Hello from lambda");
 
-   And then you can apply **terminal operations -**
+              // Using static method reference
+              MyFunctionalInterface methodReferenceFunctionalInterface = StaticMethodReferenceExample::staticDisplay;
+              methodReferenceFunctionalInterface.display("Hello from method reference");
 
-   1. collect - collects into a bucket using Collectors - .collect(Collectors.toList()), collect(Collectors.toSet()),collect(Collectors.toMap(k,v)), collect(Collectors.joining("-")) - returns String and here "-" is the delimeter, it joins all the elements with the delimeter between all the elements. Collectors.partitioningBy(), Collectors.groupingBy(e -> e.key()),
-      Collectors.allMatch(), noneMatch(), anyMatch() - shortcircuit operations - they return Boolean(true/false)
-   2. min,
-   3. max,
-   4. count...
+        }
+        }
 
-   In Collectors.toMap(k,v), suppose if there are duplicate keys, it gives error. So, we need to manage this conflicts. So, if we want to replace the old value of the key with new value for the duplicate keys:
-   Ex. Map<String, Integer> m = names.stream()
-   .collect(Collectors.toMap(e -> e, e -> e.length(), (oldvalue, newvalue) -> newvalue))
+    3.  instance method reference - 2 types:
+        public class Main {
+        public static void main(String[] args) {
+        // Create an object of the class
+        InstanceMethodReferenceExample obj = new InstanceMethodReferenceExample();
 
-   Collectors.partitioningBy() - checks the elements on a condition and returns a Map<Boolean, List<T>> with 2 elements:
-   true, []
-   false, []
+                   // Using lambda expression
+                   MyInterface lambdaInterface = () -> obj.instanceDisplay();
+                   lambdaInterface.display();  // Calls the instance method using lambda
 
-   Collectors.groupingBy() - grouping all elements based on some key which have same value together and returns a Map<DatatypeOfKey, List<T>-
-   ex. [A(aa) , B(bb), C(cc), D(dd), E(aa), F(bb)] - groupBy - [aa, ] , [bb, bb] , [cc] , [dd]
+                   // Using instance method reference
+                   MyInterface methodReferenceInterface = obj::instanceDisplay;
+                   methodReferenceInterface.display();  // Calls the instance method using method reference
+                }
+             }
 
-   Note: What if no element gets filtered:
-   Optional<String> nameOptional = names.stream ()
-   .filter (e -> e.startsWith ("A"'))
-   .findAny();
-   System.out .println (nameOptional); // Optional.empty if element is not present
-   System.out.println (nameOptional.isPresent ()? nameOptional.get(): "Not Found");
+        a. arbitrary object method reference
+        b. particular object method reference
+        <!-- 4. direct-instance reference method - using existing class -->
 
-   String nameOptional = names.stream ()
-   .filter (e -> e.startsWith ("A"'))
-   .findAny()
-   .orElse(null)
+4.  Stream API - vvvv Imp
+    Returns Stream<T>.
+    source: set of data (it can be collection, array, I/O stream....)
 
-   filter takes predicate as input
-   map takes function as input
+    Intermediate operations are optional and there can be multiple intermediate operations.
+    On the data, you can apply **intermediate operations:**
 
-   ex. numbers.stream()
-   .filter(e -> e%2==0) // intermediate operation
-   .map(e -> e\*2) // intermediate operation
-   .forEach(System.out::println) // terminal operation
+    1. filter,
+    2. map,
+    3. flatMap - it is actually not a Map- it is for List of Lists - [[1,2], [3,4]] -> [1,2,3,4]
+    4. distinct,
+    5. sorted
+    6. skip(n) - skips first element till nth index (including nth index) element
+    7. limit(n) -
+    8. peek(e -> System.out.println(e)) - used for debugging
 
-   ArrayList<Integer> numbers = Arrays.asList(1,2,3,4,5);
+    And then you can apply **terminal operations -**
 
-   Properties of stream -
+    1. collect - collects into a bucket using Collectors - .collect(Collectors.toList()), collect(Collectors.toSet()),collect(Collectors.toMap(k,v)), collect(Collectors.joining("-")) - returns String and here "-" is the delimeter, it joins all the elements with the delimeter between all the elements. Collectors.partitioningBy(), Collectors.groupingBy(e -> e.key()),
+       Collectors.allMatch(), noneMatch(), anyMatch() - shortcircuit operations - they return Boolean(true/false)
+    2. min,
+    3. max,
+    4. count...
 
-   1. Can only go from beginning to end
-   2. Once you use it, you can no longer use the same stream
-   3. It will not affect the source
+    In Collectors.toMap(k,v), suppose if there are duplicate keys, it gives error. So, we need to manage this conflicts. So, if we want to replace the old value of the key with new value for the duplicate keys:
+    Ex. Map<String, Integer> m = names.stream()
+    .collect(Collectors.toMap(e -> e, e -> e.length(), (oldvalue, newvalue) -> newvalue))
+
+    Here, e->e is keyMapper
+    e -> e.length() is valueMapper
+    Collectors.partitioningBy() - checks the elements on a condition and returns a Map<Boolean, List<T>> with 2 elements:
+    true, []
+    false, []
+
+    Collectors.groupingBy() - grouping all elements based on some key which have same value together and returns a Map<DatatypeOfKey, List<T>-
+    ex. [A(aa) , B(bb), C(cc), D(dd), E(aa), F(bb)] - groupBy - [aa, ] , [bb, bb] , [cc] , [dd]
+
+    Note: What if no element gets filtered:
+    Optional<String> nameOptional = names.stream ()
+    .filter (e -> e.startsWith ("A"'))
+    .findAny();
+    System.out .println (nameOptional); // Optional.empty if element is not present
+    System.out.println (nameOptional.isPresent ()? nameOptional.get(): "Not Found");
+
+    String nameOptional = names.stream ()
+    .filter (e -> e.startsWith ("A"'))
+    .findAny()
+    .orElse(null)
+
+    filter takes predicate as input
+    map takes function as input
+
+    ex. numbers.stream()
+    .filter(e -> e%2==0) // intermediate operation
+    .map(e -> e\*2) // intermediate operation
+    .forEach(System.out::println) // terminal operation
+
+    ArrayList<Integer> numbers = Arrays.asList(1,2,3,4,5);
+
+    Properties of stream -
+
+    1. Can only go from beginning to end
+    2. Once you use it, you can no longer use the same stream
+    3. It will not affect the source
 
 Note: Streams are lazy. Since, if there is no terminal operation, it does not perform any of the intermediate operations. Until it encounters terminal operation, it does not perform intermediate operations.
 
@@ -476,6 +541,7 @@ There are 2 types of streams:
 
 `**Spring**`
 Steps to run Spring boot project:
+
 1. Goto start.spring.io
 2. select maven, spring boot version, under metadata:
    group: com.sb.inclass.api.gateway
@@ -486,10 +552,9 @@ Steps to run Spring boot project:
 5. Import the folder to Intellij
 6. Under Edit configurations:
    For build: Add Maven and under Run command: clean install
-   For running the app:  Add another configuration: Application, enter a name for this config and under Main class choose the main class
+   For running the app: Add another configuration: Application, enter a name for this config and under Main class choose the main class
 
-
-1. .jar file - java archive. It is a collection of .class files.
+7. .jar file - java archive. It is a collection of .class files.
 
 Suppose you want to export all the files in your project. Then you can create a jar file which contains class files of all the files in your project and in a different project, you can add this jar file as a dependency in the build path.
 
@@ -629,7 +694,6 @@ or
 Controller (endpoint) - Service (Business logic) - another Web-service (SOAP/ REST) - DB
 or
 Controller (endpoint) - Service (Business logic) - Message queue (kafka) - DB
-
 
 Architecture:
 UI/postman/swagger/Curl command - filter chain - servlets - api gateway - controller - service - repository - database
@@ -781,6 +845,7 @@ All the excpeptioms are handled using:
 **Mockito:**
 All the things for which you use @Autowired, you can mock using @Mock
 JUnit - @Test
+
 1. @RunWith() - for JUnit 4 or below
 2. @ExtendWith() - for JUnit 4 or above
 
@@ -956,7 +1021,7 @@ For every Entity, there will be a corresponding Repository.
 Ex.
 Employee table -> Employee class -> EmployeeRepository
 
-findBy___And____()
+findBy**\_And\_\_**()
 
 **Operations in Repository given by Hibernate:**
 
@@ -1056,6 +1121,7 @@ Boomer
 
 **SonarQube**
 Rules like:
+
 1. If you have very long nested if
 2. if your method is too lengthy (too many lines)
 3. If there are any vulnerabilities etc....
@@ -1168,7 +1234,7 @@ Design patterns:
 3. FeignClient
 4. RestTemplate - deprecated - only synchronous
 
-deprecated - means this feature will not available from next or upcoming releases. 
+deprecated - means this feature will not available from next or upcoming releases.
 
 These calls can be synchronous/ asynchronous.
 Synchronous - after calling the web service, you wait for the response
@@ -1179,6 +1245,7 @@ Synchronous - after calling the web service, you wait for the response
 In production code, you should never write system.out.println because whenever you restart the app, they get cleared.
 You should use logger, because it is stored - log statements. These statements will be rolled onto log files.
 Log levels:
+
 1. ALL
 2. TRACE
 3. DEBUG - generally used when debugging beta version
@@ -1186,7 +1253,7 @@ Log levels:
 5. WARN - very commonly used
 6. ERROR - commonly used
 7. FATAL
-This is high level to low level hierarchy.
+   This is high level to low level hierarchy.
 
 In application.properties file, you mention file name along with path, log level, max file size etc.... So, it will start saving logs into that file and when the file reaches its max
 size, it will zip that file and creates another file and starts writing into that file.
@@ -1202,33 +1269,31 @@ Note: sensitive information (PII information - personal identifier information) 
 ex.
 try{
 } catch(Exception ex) {
-   log.error('dfahadf', ex);
-   log.info('firstname passed {} lastname passed {}', fname, lname); // This is place holder. Better practice as compared to concatenation.
+log.error('dfahadf', ex);
+log.info('firstname passed {} lastname passed {}', fname, lname); // This is place holder. Better practice as compared to concatenation.
 }
 
 Note: You can also customize the print statements of the logs being printed
 
-
 What would you do if a prod (production) issue happens?
+
 1. Check what the issue by checking the logs
 2. try to replicate the issue
 3. check how exactly the issue happened using logger statements.
 4. find the fix
 
 Suppose you want to modify application.properties for production:
+
 1. first way is to change application-prod.properties file and build jar file again and deploy this - but this is not suggestible
 2. second way - for some cloud config servers - you can modify profiles - this will over-ride application.properties configuration.
 3. SCCS - Spring Cloud Config Server - it is a config server from where your code deployed server will talk with - just like rollout in FactSet- all the configuration is maintained here. Your app will pull the configuration on the fly in real time
 
-
-
 Note: Normally Stringbuilder is used when you need to append multiple strings. Stringbuffer is used when you're using multithreading. Stringbuffer is threadsafe.
 
 Threading:
-Suppose some logic needs to be executed by multiple threads, that piece of code is called as critical section. 
-You need to put this entire section inside a synchronized block so that whenever one thread is using it, it will lock 
+Suppose some logic needs to be executed by multiple threads, that piece of code is called as critical section.
+You need to put this entire section inside a synchronized block so that whenever one thread is using it, it will lock
 that section and only after it releases the block the next thread can use it.
-
 
 publisher/ consumer <-> producer/consumer <-> event streaming <-> used in kafka. This process is asynchronous communication.
 This is similar Observer design pattern.
@@ -1236,9 +1301,9 @@ This is similar Observer design pattern.
 Note: Temporary Place where publisher places the data is called as topic. It is a queue where data is placed temporarily.
 Once every consumer consumes the data, it is deleted from the topic.
 
-1. In HttpClient (syncrhonous communication), after sending the data, it waits for a response. 
-2. But in Kafka (asynchronous communication), it sends data into a topic and it does not wait for a response. This is 
-   called fire and forget. 
+1. In HttpClient (syncrhonous communication), after sending the data, it waits for a response.
+2. But in Kafka (asynchronous communication), it sends data into a topic and it does not wait for a response. This is
+   called fire and forget.
 3. Reactive spring: uses publisher-subscriber pattern
    Mono - kind of producer - for returning single data - ex. instead of returning String, you can use Mono<String>
    Flux - kind of producer - stores multiple data - ex. instead of returning List<String>, you can use Flux<String>
@@ -1251,11 +1316,12 @@ Once every consumer consumes the data, it is deleted from the topic.
 
 Mono and Flux concept (asynchronous communication) - is present in both Webclient and Reactive spring.
 Reactive Spring:
-1. Suppose your backend is sending a response which has multiple elements, generally you send all of it at once only 
-   after entire response is processed and ready to be sent. But in Reactive spring, you wouldn't wait until entire 
+
+1. Suppose your backend is sending a response which has multiple elements, generally you send all of it at once only
+   after entire response is processed and ready to be sent. But in Reactive spring, you wouldn't wait until entire
    response is ready, you keep sending parts of the response that are processed instead of waiting for all of the
    elements to be processed.
-2. Suppose you've submitted a form and the request went through. If you stop it by clicking on x button on the browser, the backend still 
+2. Suppose you've submitted a form and the request went through. If you stop it by clicking on x button on the browser, the backend still
    continues working on it. But in Reactive Spring, the backend will stop processing the request.
 
 In edit configurations inside Intellij. You cam check Allow multiple instances. So, everytime you click on run it create and run a new instance.
@@ -1264,33 +1330,33 @@ First instance will run in a new port. First one will run in a port which we hav
 There is a limit for number of connections for each instance. In cloud, suppose an instance reaches 80% connections of its max capacity.
 It creates new instances and load balancer distributes requests to multiple instances in round robin fashion.
 WebClient
+
 1. synchronous call - response.block() - it waits until it gets the response.
-
-
 
 **Monolithic vs Microservices:**
 monolithic - single application having common database.
-Microservices - multiple individual applications each having seperate databases and they may have calls between them. 
+Microservices - multiple individual applications each having seperate databases and they may have calls between them.
 Each app should have a seperate CI/CD pipeline. There are 12 factors to make an app pure microservice. But in real world,
 we may compromise on some of them.  
-Ex. In Chase app, credit score check can be a seperate module. So, even if it is down, the whole app is still working. 
-
+Ex. In Chase app, credit score check can be a seperate module. So, even if it is down, the whole app is still working.
 
 Eureka - introduced by Netflix
-1. Service registry - Eureka server - It exists on its own. ALl the Services register here. Each client may have multiple instances. 
+
+1. Service registry - Eureka server - It exists on its own. ALl the Services register here. Each client may have multiple instances.
    Every app instance (also called as Eureka Client) which is up and running will go and register here and
    keeps on updating the registry every 30 secs ~ heartbeat. Eureka client will keep on communicating with Eureka server
    informing the Eureka server that I'm running on this particular ip address and port number. Suppose you make a web client
-   request/ Rest Template request, you first go and ask Eureka server that you need this particular service, if it is available, server will 
-   return the entire registry containing IP addresses of all the instances and you use @LoadBalanced to pick one of these 
+   request/ Rest Template request, you first go and ask Eureka server that you need this particular service, if it is available, server will
+   return the entire registry containing IP addresses of all the instances and you use @LoadBalanced to pick one of these
    instances. For the first time, you place the registry in cache and for lookup in that.
-2. Service discovery - 
+2. Service discovery -
 
 Create new springboot app - add dependency - eureka server
 in the main application filke, add @
 Generally, port : 8761 is used.
 
 TO make existing project as eureka client
+
 1. pom.xml: add spring cloud dependency, eureka client dependency
 2. add @EnableDiscoveryClient tag to main class
 3. application.properties:
@@ -1300,10 +1366,11 @@ TO make existing project as eureka client
 Note: container <-> web service
 
 **Steps inside API Gateway:**
-1. Security - Authentication, Authorization  - important feature of API Gateway
+
+1. Security - Authentication, Authorization - important feature of API Gateway
 2. Routing - Routing to corresponding container
 3. LoadBalancing - of container instances
-ex. API-GEE, Spring api gateway
+   ex. API-GEE, Spring api gateway
 
 Dependency: Gateway
 
@@ -1311,7 +1378,7 @@ One of the use case of API gateway is to hide the internal URL by mapping to the
 In API-gateway, resource means endpoint.
 
 Suppose Our gateway is present at 8080 and user calls:
-http://localhost:8080/api/v1/employee-service/getUniversities 
+http://localhost:8080/api/v1/employee-service/getUniversities
 protocol - http
 ipaddress - localhost
 port - 8080
@@ -1323,7 +1390,7 @@ spring.cloud.gateway.routes[0].uri=lb://employee-service -> lb is load balanced,
 spring.cloud.gateway.routes[0].predicates=Path=/api/v1/eureka/getUniversities
 
 For the call: http://localhost:8080/api/v1/employee-service/getUniversities:
-/api/v1/employee-service/getUniversities -> this matches with our predicate.  So, gateway will map this to:
+/api/v1/employee-service/getUniversities -> this matches with our predicate. So, gateway will map this to:
 lb://employee-service/api/v1/eureka/getUniversities
 
 Since eureka server is managing this endpoint, it will send the registry and wherever the actual service is running will
@@ -1333,25 +1400,27 @@ be called (let's say port 1234): localhost:1234//api/v1/eureka/getUniversities
 When there are multiple web service calls (container calls) - one springboot app calls another which inturn calls another and the final
 one calls the db and finally the data is returned to client. This is called as circuit.
 states:
-1. OPEN - If there is any problem with any of the SB app, this is not success state, so, it is called open state. 
+
+1. OPEN - If there is any problem with any of the SB app, this is not success state, so, it is called open state.
    Even If more than like 50% calls fail, we change the state to OPEN.
 2. CLOSED - If every thing is working fine (success state) - it is called as CLOSED state.
 3. Half OPEN - we don't want our container to be in OPEN state for longer time since if it is in OPEN state, we would have to
-   send fallback page. After like 10 sec, we change state from OPEN to HALF OPEN. Now, half calls will be passed to the container 
+   send fallback page. After like 10 sec, we change state from OPEN to HALF OPEN. Now, half calls will be passed to the container
    and half calls get fallback page directly. If even in half open state, all the calls that come to the container get failed,
    then the container is again changed to OPEN state.
 
-Typically, if one of these services is down, instead of showing Internal page error 500 code; it is better to show a 
+Typically, if one of these services is down, instead of showing Internal page error 500 code; it is better to show a
 fallback page which shows some other page showing other products or something like that.
 
 ex. Histerics, Resilience4j
 
 Resilience4j:
-1. 3 dependencies: actuator, Resilience4j, spring aop 
+
+1. 3 dependencies: actuator, Resilience4j, spring aop
 2. In application.properties: resilience4j.circuitbreaker / resilience4j.retry / resilience4j.bulkhead
 
 **Actuator**
-It is integrated in circuitbreaker project 
+It is integrated in circuitbreaker project
 It will show you statistics
 It is a spring module which has some endpoints (similar to swagger), which shows number of requests sent to a container
 
@@ -1360,10 +1429,10 @@ endpoints:
 
 **AOP (Aspect Oriented Programming)**
 
-
 **Spring Security**
-There are multiple filters and servlets present between UI and controller 
+There are multiple filters and servlets present between UI and controller
 SPring security takes advantage of these filters and servlets. It also has seperate security filter. For:
+
 1. authentication - username, password - okta - authentication manager / authentication provider - it will have user details service or password
    encoder. After authentication, the user will not be re-authenticated for each request. To remember the user for subsequent requests,
    it uses security context.
@@ -1378,49 +1447,47 @@ now generated will be different but it will have the same hash value, so when yo
 it will match and the user can login successfully.
 
 ex. popular hashing algos - PBKDF2, bcrypt (uses CPU) (most often used), scrypt (uses CPU, memory), argon2 (uses CPU, memory, threads)
-sensitive info in DB.
-2. authorization - roles
-
-
+sensitive info in DB. 2. authorization - roles
 
 **Design patterns/ SOLID principles**
 patterns - solution to a problem
-design pattern - if the pattern can be used for multiple 
+design pattern - if the pattern can be used for multiple
+
 - all of them follow SOLID principles too
 
 SOLID principles - best practices that make the code more understandable and maintainable
 S - Single Responsibility of classes ex. the whole class only deals with databases / web service / kafka....
 O - Open for extension/ closed for extensions - code should be open for new features(code should be loosely coupled)
-L - Liskov substitution principle - parent classes can 
-I - Interface segregation - since interface is a contract, we should have only related stuff inside an interface.
+L - Liskov substitution principle - parent classes can
+I - Interface seggregation - since interface is a contract, we should have only related stuff inside an interface.
 D - Dependency Inversion/ Inversion of control - higher level classes/modules should not depend on lower level classes/modules
 
-
 Types of design patterns:
+
 1. Creational pattern - best way to create objects
-      **singleton pattern** (create only one instance) - make the constructor private, private static classObject = null, create another public static method getInstance() which returns this classObject and if this object is null it assigns new object. otherwise it directly returns this object.   
-         Note: Here we are using lazy loading. We can also directly create new instance and assign it to classObject instead of null (early loading).  
-      prototype pattern (everytime it will return a new instance)
-      **factory pattern** (first you order and it'll return you the object) - client should be abstracted on how the object is created
-      abstract factory pattern - avoids even more details - it is like factory on top of factory 
-      builder pattern - 
-2. structural pattern - 
-      **decorator pattern** - suppose you have a pizza, you can choose multiple toppings on this - then some chilli flakes, and then sauce and so on....
-      ex. use case - new File()
-          new FileReader()
-          new BufferedReader() ...... -> new File(new FileReader(new BufferedReader()))
-      Adapter pattern - India to US converter 
-      ex. Converting from one class to another
-      facade pattern - instead of having client to invoke different endpoints you have in different services, you'll give client only one endpoint and you'll invoke 
-                        the actual endpoints and return the data.
-      flyweight pattern -
-      proxy pattern - 
-      composite pattern
-3. behavioural pattern - 
-      strategy pattern - 
-      iterator pattern
-      chain of responsibility - There are multiple handlers. If one handler can return the appropriate response, it will return it. Otherwise, it will call some other handler and it will return the response. 
-      observer pattern - publisher subscriber. Whoever subscribes gets notification from the supplier. It does not 
-      allocate space= of t---o
-]]]]][[]]
-PROXY patterns
+   **singleton pattern** (create only one instance) - make the constructor private, private static classObject = null, create another public static method getInstance() which returns this classObject and if this object is null it assigns new object. otherwise it directly returns this object.  
+    Note: Here we are using lazy loading. We can also directly create new instance and assign it to classObject instead of null (early loading).  
+    prototype pattern (everytime it will return a new instance)
+   **factory pattern** (first you order and it'll return you the object) - client should be abstracted on how the object is created
+   abstract factory pattern - avoids even more details - it is like factory on top of factory
+   builder pattern -
+2. structural pattern -
+   **decorator pattern** - suppose you have a pizza, you can choose multiple toppings on this - then some chilli flakes, and then sauce and so on....
+   ex. use case - new File()
+   new FileReader()
+   new BufferedReader() ...... -> new File(new FileReader(new BufferedReader()))
+   Adapter pattern - India to US converter
+   ex. Converting from one class to another
+   facade pattern - instead of having client to invoke different endpoints you have in different services, you'll give client only one endpoint and you'll invoke
+   the actual endpoints and return the data.
+   flyweight pattern -
+   proxy pattern -
+   composite pattern
+3. behavioural pattern -
+   strategy pattern -
+   iterator pattern
+   chain of responsibility - There are multiple handlers. If one handler can return the appropriate response, it will return it. Otherwise, it will call some other handler and it will return the response.
+   observer pattern - publisher subscriber. Whoever subscribes gets notification from the supplier. It does not
+   allocate space= of t---o
+   ]]]]][[]]
+   PROXY patterns
