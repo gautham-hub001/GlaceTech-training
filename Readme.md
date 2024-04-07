@@ -38,6 +38,8 @@ super() is called from child class constructor
    method overloading - same method name but signatures(parameters - datatype and number) are different
    method overriding - inheritance - same method and signature but different implementation - you are re-implementing again in the child class.
 
+Note: static method cannot be overloaded in java
+
 **conditional and loop statements**
 if
 if elseif
@@ -694,6 +696,13 @@ or
 Controller (endpoint) - Service (Business logic) - another Web-service (SOAP/ REST) - DB
 or
 Controller (endpoint) - Service (Business logic) - Message queue (kafka) - DB
+
+Kafka - distributed event service platform. It can be consumed using Java streams api
+It is a message Queue - it is a Queue -> so consumer receives the records in same order as they were placed by the producers.
+It can be both synchronous/asynchronous
+
+1.  topic - log of events kept in order
+2.  broker - server which holds topics. Multiple brokers are used for fault tolerance
 
 Architecture:
 UI/postman/swagger/Curl command - filter chain - servlets - api gateway - controller - service - repository - database
